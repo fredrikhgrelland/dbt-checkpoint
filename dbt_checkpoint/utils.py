@@ -394,6 +394,12 @@ def add_tracking_args(parser: argparse.ArgumentParser) -> None:
         help="True the execution is a test.",
     )
 
+def add_warning_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--warning",
+        action="store_true",
+        help="True the execution should not fail, only emit logs.",
+    )
 
 def add_default_args(parser: argparse.ArgumentParser) -> None:
     add_filenames_args(parser)

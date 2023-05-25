@@ -256,6 +256,7 @@ Ensures that the model has a description in the properties file (usually `schema
 #### Arguments
 
 `--manifest`: location of `manifest.json` file. Usually `target/manifest.json`. This file contains a full representation of dbt project. **Default: `target/manifest.json`**
+`--warning`: only emit warnings, do not fail if missing.
 
 #### Example
 

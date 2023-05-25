@@ -7,6 +7,7 @@ from dbt_checkpoint.tracking import dbtCheckpointTracking
 from dbt_checkpoint.utils import (
     JsonOpenError,
     add_default_args,
+    add_warning_args,
     get_filenames,
     get_json,
     get_missing_file_paths,
@@ -14,10 +15,11 @@ from dbt_checkpoint.utils import (
     get_model_sqls,
     get_models,
     red,
+    yellow,
 )
 
 
-def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> Dict[str, Any]:
+def has_description(paths: Sequence[str], warning: bool, manifest: Dict[str, Any]) -> Dict[str, Any]:
     paths = get_missing_file_paths(paths, manifest)
 
     status_code = 0
@@ -38,17 +40,24 @@ def has_description(paths: Sequence[str], manifest: Dict[str, Any]) -> Dict[str,
     missing = filenames.difference(in_models, in_schemas)
 
     for model in missing:
-        status_code = 1
-        print(
-            f"{red(sqls.get(model))}: "
-            f"does not have defined description or properties file is missing.",
-        )
+        if warning:
+            print(
+                f"{yellow(sqls.get(model))}: "
+                f"does not have defined description or properties file is missing.",
+            )
+        else:
+            status_code = 1
+            print(
+                f"{red(sqls.get(model))}: "
+                f"does not have defined description or properties file is missing.",
+            )
     return {"status_code": status_code}
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
     add_default_args(parser)
+    add_warning_args(parser)
 
     args = parser.parse_args(argv)
 
@@ -59,7 +68,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 1
 
     start_time = time.time()
-    hook_properties = has_description(paths=args.filenames, manifest=manifest)
+    hook_properties = has_description(paths=args.filenames, warning=args.warning, manifest=manifest)
     end_time = time.time()
     script_args = vars(args)
 
